@@ -24,6 +24,8 @@ public class PlayerMovement : MonoBehaviour
     private float wallJumpingCounter;
     private float wallJumpingDuration = 0.2f;
     private Vector2 wallJumpingPower = new Vector2(2f, 16f);
+    private float screenWipeCooldown = 20f;
+    private bool canScreenWipe = true;
         
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck;
@@ -32,6 +34,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask wallLayer;
     [SerializeField] private TrailRenderer tr;
     [SerializeField] private LogicManager logic;
+    [SerializeField] private GameObject screenWipe;
+    
     public Animator animator;
     void Update()
     {
@@ -74,7 +78,10 @@ public class PlayerMovement : MonoBehaviour
         {
             StartCoroutine(Dash());
         }
-        
+        if (Input.GetKeyDown(KeyCode.R) && canScreenWipe)
+        {
+           StartCoroutine (ScreenWipe());
+        }
         WallSlide();
         WallJump();
         if (!isWallJumping)
@@ -202,5 +209,19 @@ public class PlayerMovement : MonoBehaviour
             }
             TakeDamage();
         }
+    }
+
+    private IEnumerator ScreenWipe()
+    {
+    
+        screenWipe.GetComponent<Animator>().SetTrigger("Wipe");
+        GameObject[] bullets = GameObject.FindGameObjectsWithTag("Bullet");
+        foreach (GameObject bullet in bullets)
+        {
+            Destroy(bullet);
+        }
+        canScreenWipe = false;
+        yield return new WaitForSeconds(screenWipeCooldown);
+        canScreenWipe = true;
     }
 }
