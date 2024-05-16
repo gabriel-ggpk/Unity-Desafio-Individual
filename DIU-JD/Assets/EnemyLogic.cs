@@ -11,8 +11,14 @@ public class EnemyLogic : MonoBehaviour
     private float shotTimer;
     private int bulletNumber = 1;
     [SerializeField] Animator animator;
-
-
+    public SpriteRenderer spriteRenderer;
+    void Awake()
+    {
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+        }
+    }
     void Start()
     {
         player = GameObject.Find("Player");
@@ -32,9 +38,9 @@ public class EnemyLogic : MonoBehaviour
     public void ApplyConfig(EnemyConfig config)
     {
         bulletNumber = config.bulletNumber;
-        if (this.GetComponent<Renderer>() != null)
+        if (spriteRenderer != null)
         {
-            this.GetComponent<Renderer>().material.color = config.color; // Apply color change
+            spriteRenderer.color = config.color; // Apply color change
         }
     }
     private void TriggerShotAnimation()

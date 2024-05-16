@@ -3272,7 +3272,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grid: {fileID: 1515867933}
   EnemyPF: {fileID: 8105220114022388283, guid: 184c14ac7edd5bf49b307a21f76c0915, type: 3}
-  spawnTime: 3
+  difficulty: 2
+  enemyConfigs:
+  - {fileID: 11400000, guid: 0b0519ec7e6c710499aeb00f5926c606, type: 2}
+  - {fileID: 11400000, guid: e72a170e718952c4ebd59b55d8daa7a1, type: 2}
+  - {fileID: 11400000, guid: 0de483b7bb96d5e44be895ab05795bb5, type: 2}
+  baseSpawnInterval: 5
 --- !u!4 &858298505
 Transform:
   m_ObjectHideFlags: 0

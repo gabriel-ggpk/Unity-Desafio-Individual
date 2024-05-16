@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37fb9cc28e07042418908bb9178f5e35, type: 3}
   m_Name: BasicMob
   m_EditorClassIdentifier: 
-  spawnCost: 0
-  bulletNumber: 0
-  color: {r: 1, g: 0, b: 0, a: 0}
+  spawnCost: 1
+  bulletNumber: 1
+  color: {r: 1, g: 1, b: 1, a: 1}

@@ -1,7 +1,5 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
-using System.Threading;
-using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -13,36 +11,70 @@ public class EnemySpawner : MonoBehaviour
     public Grid grid;
 
     [SerializeField] GameObject EnemyPF;
-    [SerializeField] float spawnTime = 3f;
-    [SerializeField] float difficulty = 2f;
+    [SerializeField] int difficulty = 2;
     public List<EnemyConfig> enemyConfigs;
+    public float baseSpawnInterval = 5f;
+    private float spawnInterval = 0f;
+    private float elapsedTime = 0f;
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(Spawn());
+        UpdateSpawnInterval();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        elapsedTime += Time.deltaTime;
+
+        if (elapsedTime >= spawnInterval)
+        {
+            SpawnMobs();
+            elapsedTime = 0f;
+        }
     }
-    private IEnumerator Spawn()
+    void SpawnMobs()
     {
-        yield return new WaitForSeconds(5);
-        float points = difficulty;
-        List<GameObject> spawnableEnemies = new List<GameObject>();
-        Vector3 spawnPos = new Vector3(Random.Range(-14, 20), Random.Range(-5, 10), 0);
-        while(!CanSpawn(spawnPos)) spawnPos = new Vector3(Random.Range(-14, 20), Random.Range(-5, 10), 0);
-        GameObject enemyType = EnemyPF;
+        int points = difficulty;
+        List<EnemyConfig> spawnableEnemies = new List<EnemyConfig>();
 
-        GameObject newEnemy = Instantiate(EnemyPF, new Vector3(Random.Range(-14,20), Random.Range(-5, 10),0),Quaternion.identity);
-        difficulty = difficulty + (2 + 0.1f * (difficulty / 100));
-        StartCoroutine(Spawn());
+        // Determine which enemies can be spawned based on available points
+        foreach (EnemyConfig config in enemyConfigs)
+        {
+            if (config.spawnCost <= points)
+            {
+                spawnableEnemies.Add(config);
+            }
+        }
+
+        // Sort by cost descending to prioritize higher-cost enemies
+        spawnableEnemies.Sort((a, b) => b.spawnCost.CompareTo(a.spawnCost));
+
+        foreach (EnemyConfig config in spawnableEnemies)
+        {
+            if (points >= config.spawnCost)
+            {
+                SpawnEnemy(config);
+                points -= config.spawnCost;
+                Debug.Log("Spawned enemy with config: " + config.name + ", Remaining Points: " + points);
+            }
+        }
+        difficulty = (int)(difficulty + (2 + Math.Ceiling( 0.1f * (difficulty / 100))));
     }
-
+    void SpawnEnemy(EnemyConfig config)
+    {
+        Vector3 spawnPos = new Vector3(UnityEngine.Random.Range(-14, 20), UnityEngine.Random.Range(-5, 10), 0);
+        while (!CanSpawn(spawnPos)) spawnPos = new Vector3(UnityEngine.Random.Range(-14, 20), UnityEngine.Random.Range(-5, 10), 0);
+        GameObject enemyObject = Instantiate(EnemyPF, spawnPos, Quaternion.identity);
+        EnemyLogic enemy = enemyObject.GetComponent<EnemyLogic>();
+        enemy.ApplyConfig(config);
+    }
     // Assign this in the inspector with all tilemaps you want to check
-
+    void UpdateSpawnInterval()
+    {
+        int difficultyLevel = difficulty;
+        spawnInterval = (float)(baseSpawnInterval / Math.Log(difficultyLevel,2));
+    }
     public bool CanSpawn(Vector3 worldPosition)
     {
         Vector3Int cellPosition = grid.WorldToCell(worldPosition);
