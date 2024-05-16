@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -12,11 +13,13 @@ public class EnemySpawner : MonoBehaviour
     public Grid grid;
 
     [SerializeField] GameObject EnemyPF;
-    [SerializeField] float spawnTime = 3f; 
+    [SerializeField] float spawnTime = 3f;
+    [SerializeField] float difficulty = 2f;
+    public List<EnemyConfig> enemyConfigs;
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(Spawn(spawnTime));
+        StartCoroutine(Spawn());
     }
 
     // Update is called once per frame
@@ -24,13 +27,18 @@ public class EnemySpawner : MonoBehaviour
     {
         
     }
-    private IEnumerator Spawn(float timer)
+    private IEnumerator Spawn()
     {
-        yield return new WaitForSeconds(timer);
+        yield return new WaitForSeconds(5);
+        float points = difficulty;
+        List<GameObject> spawnableEnemies = new List<GameObject>();
         Vector3 spawnPos = new Vector3(Random.Range(-14, 20), Random.Range(-5, 10), 0);
         while(!CanSpawn(spawnPos)) spawnPos = new Vector3(Random.Range(-14, 20), Random.Range(-5, 10), 0);
+        GameObject enemyType = EnemyPF;
+
         GameObject newEnemy = Instantiate(EnemyPF, new Vector3(Random.Range(-14,20), Random.Range(-5, 10),0),Quaternion.identity);
-        StartCoroutine(Spawn(timer*0.95f));
+        difficulty = difficulty + (2 + 0.1f * (difficulty / 100));
+        StartCoroutine(Spawn());
     }
 
     // Assign this in the inspector with all tilemaps you want to check

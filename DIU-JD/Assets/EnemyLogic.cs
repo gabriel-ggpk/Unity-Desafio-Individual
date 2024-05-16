@@ -7,8 +7,9 @@ public class EnemyLogic : MonoBehaviour
     private GameObject player;
     public float bulletSpeed = 10f;
     [SerializeField] GameObject bulletPrefab;
-    private float shotCooldown = 2f; // Cooldown time in seconds
+    private float shotCooldown = 4f; // Cooldown time in seconds
     private float shotTimer;
+    private int bulletNumber = 1;
     [SerializeField] Animator animator;
 
 
@@ -28,7 +29,14 @@ public class EnemyLogic : MonoBehaviour
             TriggerShotAnimation(); // This should trigger the animation
         }
     }
-
+    public void ApplyConfig(EnemyConfig config)
+    {
+        bulletNumber = config.bulletNumber;
+        if (this.GetComponent<Renderer>() != null)
+        {
+            this.GetComponent<Renderer>().material.color = config.color; // Apply color change
+        }
+    }
     private void TriggerShotAnimation()
     {
         animator.SetTrigger("Shooting");

@@ -186,6 +186,24 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(dashingCooldown);
         canDash = true;
     }
+    private void ActivateBulletTime()
+    {
+        Time.timeScale = 0.5f;  // Slow down time to half speed
+        Time.fixedDeltaTime = Time.timeScale * 0.02f;  // Adjust the physics update rate
+    }
+
+    private void DeactivateBulletTime()
+    {
+        Time.timeScale = 1.0f;  // Reset time scale to normal speed
+        Time.fixedDeltaTime = 0.02f;  // Reset the physics update rate to default
+    }
+
+    private IEnumerator BulletTimeCoroutine(float duration)
+    {
+        ActivateBulletTime();
+        yield return new WaitForSecondsRealtime(duration);  // Use WaitForSecondsRealtime to ignore time scaling
+        DeactivateBulletTime();
+    }
 
     public void TakeDamage()
     {
@@ -206,6 +224,8 @@ public class PlayerMovement : MonoBehaviour
 
             enemy.TakeDamage();
             logic.addScore();
+              StartCoroutine(BulletTimeCoroutine(1.0f));  // 1 second of bullet time
+            canDash = true;
             }
             TakeDamage();
         }
